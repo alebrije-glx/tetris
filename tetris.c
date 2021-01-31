@@ -67,7 +67,7 @@ float timedifference_msec(struct timeval t0, struct timeval t1);
 
 int tipo_forma, tamano;
 int pieza_colocada, game_over;
-int pos_x, pos_y, top_x;	// top_x es la posicion de la pieza que esta colocada mas arriba.
+int pos_x, pos_y, top_y;	// top_x es la posicion de la pieza que esta colocada mas arriba.
 							// que sirve como limite para hacer el recorrido de las filas
 int opcion, mov_abajo;		// Para leer el teclado debe ser un entero, no char (en ncurses)
 
@@ -87,7 +87,7 @@ int main(void)
 	
 	pieza_colocada = 1, game_over = 0;
 	
-	top_x = (int)TABLERO_H;
+	top_y = (int)TABLERO_H;
 	
 	initscr();
 	cbreak(); // para poder salir del programa con CTR-Z
@@ -106,7 +106,7 @@ int main(void)
 	{	
 		if(pieza_colocada)
 		{
-			pos_x = 0; pos_y = (TABLERO_W / 2) - 2;
+			pos_y = 0; pos_x = (TABLERO_W / 2) - 2;
 
 			selecciona_figura();
 			asigna_figura();
@@ -118,7 +118,7 @@ int main(void)
 			{
 				mvprintw(17, 0, "Figura seleccionada: %s", nombre_fig[tipo_forma]);
 				mvprintw(17, 40, "Tamano: %d..", tamano);
-				mvprintw(4, 35, "cima x: %d", top_x);
+				mvprintw(4, 35, "cima y: %d", top_y);
 				pieza_colocada = 0;
 			}
 			
@@ -146,7 +146,7 @@ int main(void)
 					break;
 				
 				case KEY_LEFT:
-					if(pos_y - 1 >= 0)
+					if(pos_x - 1 >= 0)
 						verifica_movimiento(M_IZQ);
 					else
 						movimiento_en_limites(M_IZQ);
@@ -155,7 +155,7 @@ int main(void)
 					break;
 
 				case KEY_RIGHT:
-					if(pos_y + 1 <= TABLERO_W - tamano)
+					if(pos_x + 1 <= TABLERO_W - tamano)
 						verifica_movimiento(M_DER);
 					else
 						movimiento_en_limites(M_DER);
@@ -164,15 +164,15 @@ int main(void)
 					break;
 				
 				case KEY_DOWN:
-					if(pos_x + 1 <= TABLERO_H - tamano)
+					if(pos_y + 1 <= TABLERO_H - tamano)
 						verifica_movimiento(M_ABAJO);
 					else
 						movimiento_en_limites(M_ABAJO);
 
 					if(pieza_colocada)
 					{
-						if (pos_x < top_x) top_x = pos_x;
-						mvprintw(4, 35, "cima x: %d...", top_x);
+						if (pos_y < top_y) top_y = pos_y;
+						mvprintw(4, 35, "cima y: %d...", top_y);
 						refresh();
 						coloca_figura_en_tablero();
 						verifica_linea_completa();
@@ -185,7 +185,7 @@ int main(void)
 				default:
 					tiempo_limite = (long)timedifference_msec(t_anterior, t_actual);
 					
-					if(tiempo_limite > 500) {
+					if(tiempo_limite > 2000) { // 500
 						mov_abajo = 1;
 						gettimeofday(&t_anterior, 0);
 					}
@@ -282,15 +282,15 @@ int movimiento_interno(int direccion)
 			break;
 	}
 	// Detectar la colisión de la figura (matriz) del movimiento.
-	i = 0; px = pos_x;
+	i = 0; py = pos_y;
 	while(!colision && i < tamano) {
-		py = pos_y; j = 0;
+		px = pos_x; j = 0;
 		while(!colision && j < tamano)
 		{
-			if(matriz[i][j] && tablero[px][py]) colision = 1; 
-			j++; py++;
+			if(matriz[i][j] && tablero[py][px]) colision = 1; 
+			j++; px++;
 		}
-		i++; px++;
+		i++; py++;
 	}
 	// Si no hay colision, se ajusta la pieza.
 	if(!colision) {
@@ -332,42 +332,42 @@ void filtra_cima()
 {
 	int col, fila_vacia = 1;
 	
-	while(fila_vacia && top_x < TABLERO_H) {
+	while(fila_vacia && top_y < TABLERO_H) {
 		col = 0;
 		while(fila_vacia && col < TABLERO_W)
 		{
-			if(tablero[top_x][col])
+			if(tablero[top_y][col])
 				fila_vacia = 0;
 			col++;
 		}
 		if(fila_vacia)
-			top_x = top_x + 1;
+			top_y = top_y + 1;
 	}
 }
 
 void verifica_linea_completa()
 {
-	int i, j, px = pos_x, linea_completa;
+	int i, j, py = pos_y, linea_completa;
 	
 	filtra_cima();
 	
-	for(i = 0; i < tamano; i++, px++)
+	for(i = 0; i < tamano; i++, py++)
 	{
 		linea_completa = 1;
 		j = 0;
 		while(linea_completa && j < TABLERO_W)
 		{
-			if(!tablero[px][j]) linea_completa = 0;
+			if(!tablero[py][j]) linea_completa = 0;
 			mvprintw(10+i, 60-j, ".");
 			j++;
 		}
 		if(linea_completa)
 		{
 			// Aqui va la rutina para efecto?
-			mvprintw(10+i, 35, "Linea completa: %d", px);
-			recorre_filas_abajo(px);
-			top_x = top_x + 1;
-			mvprintw(6, 35, "FUNC cima a: %d...", top_x);
+			mvprintw(10+i, 35, "Linea completa: %d", py);
+			recorre_filas_abajo(py);
+			top_y = top_y + 1;
+			mvprintw(6, 35, "FUNC cima a: %d...", top_y);
 			refresh();
 		}
 	}
@@ -377,9 +377,9 @@ void recorre_filas_abajo(int fila)
 {
 	int col, aux = 0;
 	
-	for(; fila >= top_x; fila--, aux++)
+	for(; fila >= top_y; fila--, aux++)
 		for(col = 0; col < TABLERO_W; col++)
-			tablero[fila][col] = (fila > 0 || fila > top_x ? tablero[fila-1][col] : 0);
+			tablero[fila][col] = (fila > 0 || fila > top_y ? tablero[fila-1][col] : 0);
 	mvprintw(14, 35, "Linea recorridas: %d...", aux);
 }
 
@@ -387,13 +387,14 @@ void verifica_movimiento(int direccion)
 {
 	int px = pos_x, py = pos_y;
 	// detecta_colision(px, py)
-	if(!detecta_colision(direccion == M_ABAJO ? px + 1 : px, direccion == M_IZQ ? py - 1: (direccion == M_DER ? py + 1 : py)))
+	//if(!detecta_colision(direccion == M_ABAJO ? py + 1 : py, direccion == M_IZQ ? px - 1: (direccion == M_DER ? px + 1 : px)))
+	if(!detecta_colision(direccion == M_IZQ ? px - 1: (direccion == M_DER ? px + 1 : px), direccion == M_ABAJO ? py + 1 : py))
 	{
 		if(direccion == M_IZQ || direccion == M_DER)
-			pos_y = (direccion == M_IZQ ? py - 1 : py + 1);
+			pos_x = (direccion == M_IZQ ? px - 1 : px + 1);
 		
 		if(direccion == M_ABAJO)
-			pos_x = px + 1; // o pox_x++;
+			pos_y = py + 1; // o pox_x++;
 
 		mvprintw(19, 0, "x = %d, y = %d...", pos_x, pos_y);
 		mvprintw(21, 35, "NOR movimiento a: [ %d][ %d]....", pos_x, pos_y);
@@ -405,24 +406,24 @@ void verifica_movimiento(int direccion)
 
 int detecta_colision(int px, int py)
 {
-	int i = 0, j, /*x = px,*/ y; // No se necesita x, se puede usar px directamente
+	int i = 0, j, /*x = px,*/ x; // No se necesita x, se puede usar px directamente
 	
 	int colision = 0;
 	
 	while(!colision && i < tamano)
 	{
-		y = py; j = 0;
+		x = px; j = 0;
 		while(!colision && j < tamano)
 		{
-			if(tipo_forma == F_CUADRADO) colision = (figura_2x2[i][j] && tablero[px][y]);
-			else if (tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) colision = (figura_3x3[i][j] && tablero[px][y]);
-			else colision = (figura_4x4[i][j] && tablero[px][y]);
-			j++; y++;
+			if(tipo_forma == F_CUADRADO) colision = (figura_2x2[i][j] && tablero[py][x]);
+			else if (tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) colision = (figura_3x3[i][j] && tablero[py][x]);
+			else colision = (figura_4x4[i][j] && tablero[py][x]);
+			j++; x++;
 		}
-		i++; px++;
+		i++; py++;
 	}
 
-	if(colision) { mvprintw(21, 0, "NOR Colision en [ %d][ %d]..", px-1, y-1); refresh();} 
+	if(colision) { mvprintw(21, 0, "NOR Colision en [ %d][ %d]..", x-1, py-1); refresh();} 
 	else mvprintw(21, 0, "NOR No se detecto colision.....");
 	
 	return colision;
@@ -432,34 +433,34 @@ void coloca_figura_en_tablero()
 {
 	int i, j, py, px;
 	
-	for(i = 0, px = pos_x; i < tamano; i++, px++)
-		for(j = 0, py = pos_y; j < tamano; j++, py++)
+	for(i = 0, py = pos_y; i < tamano; i++, py++)
+		for(j = 0, px = pos_x; j < tamano; j++, px++)
 		{
 			if(tipo_forma == F_CUADRADO) {
-				if(figura_2x2[i][j]) tablero[px][py] = figura_2x2[i][j];
+				if(figura_2x2[i][j]) tablero[py][px] = figura_2x2[i][j];
 			}
 			else if (tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) {
-				if(figura_3x3[i][j]) tablero[px][py] = figura_3x3[i][j];
+				if(figura_3x3[i][j]) tablero[py][px] = figura_3x3[i][j];
 			}
-			else if(figura_4x4[i][j]) tablero[px][py] = figura_4x4[i][j];
+			else if(figura_4x4[i][j]) tablero[py][px] = figura_4x4[i][j];
 		}
 }
 
 void imprime_figura()
 {
-	int i, j, py, px = pos_x;
+	int i, j, px, py = pos_y;
 	
-	for(i = 0; i < tamano; i++, px++)
+	for(i = 0; i < tamano; i++, py++)
 	{		
-		py = pos_y;
-		for (j = 0; j < tamano; j++, py++) {
+		px = pos_x;
+		for (j = 0; j < tamano; j++, px++) {
 			if(tipo_forma == F_CUADRADO){
-				if(figura_2x2[i][j]) mvprintw(px, py*2, "%d", figura_2x2[i][j]);
+				if(figura_2x2[i][j]) mvprintw(py, px*2, "%d", figura_2x2[i][j]);
 			}
 			else if (tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) {
-				if(figura_3x3[i][j]) mvprintw(px, py*2, "%d", figura_3x3[i][j]);
+				if(figura_3x3[i][j]) mvprintw(py, px*2, "%d", figura_3x3[i][j]);
 			}
-			else if(figura_4x4[i][j]) mvprintw(px, py*2, "%d", figura_4x4[i][j]);
+			else if(figura_4x4[i][j]) mvprintw(py, px*2, "%d", figura_4x4[i][j]);
 		}
 	}
 	refresh();
@@ -489,7 +490,7 @@ void inicializa_tablero()
 
 int rotar_figura()
 {
-	int i, j, k, colision = 0, px = pos_x, py;
+	int i, j, k, colision = 0, py = pos_y, px;
 	int aux[tamano][tamano]; // Matriz auxiliar para guardar la rotacion.
 
 	for(i = 0, k = tamano - 1; i < tamano, k >= 0; i++, k--)
@@ -502,13 +503,13 @@ int rotar_figura()
 	// Se verfica que al momento de querer girar la pieza no haya colision.
 	i = 0;
 	while(!colision && i < tamano) {
-		py = pos_y; j = 0;
+		px = pos_x; j = 0;
 		while(!colision && j < tamano)
 		{
-			if(aux[i][j] && tablero[px][py]) colision = 1; 
-			j++; py++;
+			if(aux[i][j] && tablero[py][px]) colision = 1; 
+			j++; px++;
 		}
-		i++; px++;
+		i++; py++;
 	}
 	// Si no hay colision gira la pieza y se debe imprimir en la pantalla (en el ciclo main)
 	if(!colision)
