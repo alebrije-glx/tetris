@@ -67,14 +67,14 @@ float timedifference_msec(struct timeval t0, struct timeval t1);
 
 int tipo_forma, tamano;
 int pieza_colocada, game_over;
-int pos_x, pos_y, top_y;	// top_x es la posicion de la pieza que esta colocada mas arriba.
-							// que sirve como limite para hacer el recorrido de las filas
-int opcion, mov_abajo;		// Para leer el teclado debe ser un entero, no char (en ncurses)
+int pos_x, pos_y, top_y;	// top_y es la posicion de la pieza que esta colocada mas arriba.
+							// que sirve como limite para hacer el recorrido de las filas.
+int opcion, mov_abajo;		// Para leer el teclado (en ncurses) debe ser un entero, no char.
 
 int main(void)
 {
 	int scr_size_x = 0, scr_size_y = 0;
-	//int opcion; 
+
 	struct timeval tincio, tfin, t_anterior, t_actual;
 	
 	float tiempo_transcurrido; // Tiempo en milisegundos (ms).
@@ -90,12 +90,12 @@ int main(void)
 	top_y = (int)TABLERO_H;
 	
 	initscr();
-	cbreak(); // para poder salir del programa con CTR-Z
+	cbreak();
 	noecho(); // No imprime teclas en pantalla, no es tan necesaria.
-	curs_set(FALSE);
+	curs_set(FALSE);	// Deshabilita el cursor.
 	keypad(stdscr, TRUE); // Para usar las teclas de control, dirección, teclado númerico, etc.
 	
-	getmaxyx(stdscr, scr_size_y, scr_size_x);
+	getmaxyx(stdscr, scr_size_y, scr_size_x); // Obtiene el tamaño de la ventana.
 	
 	inicializa_tablero();
 	imprime_tablero();
@@ -406,7 +406,7 @@ void verifica_movimiento(int direccion)
 
 int detecta_colision(int px, int py)
 {
-	int i = 0, j, /*x = px,*/ x; // No se necesita x, se puede usar px directamente
+	int i = 0, j, x; // No se necesita y, se puede usar py directamente
 	
 	int colision = 0;
 	
