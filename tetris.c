@@ -259,7 +259,9 @@ int movimiento_interno(int direccion)
 			for(i = 0; i < tamano; i++)
 				for(j = 0; j < tamano ; j++)
 				{
-					if(tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO)
+					if(tamano < 3)
+                        matriz[i][j] = (j < tamano -1) ? figura_2x2[i][j+1] : 0;
+                    else if(tamano < 4)
 						matriz[i][j] = (j < tamano -1) ? figura_3x3[i][j+1] : 0;
 					else
 						matriz[i][j] = (j < tamano -1) ? figura_4x4[i][j+1] : 0;
@@ -270,10 +272,12 @@ int movimiento_interno(int direccion)
 			for(i = 0; i < tamano; i++)
 				for(j = tamano - 1; j >= 0; j--)
 				{
-					if(tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO)
+                    if(tamano < 3)
+                        matriz[i][j] = (j > 0) ? figura_2x2[i][j-1] : 0;
+					else if(tamano < 4)
 						matriz[i][j] = (j > 0) ? figura_3x3[i][j-1] : 0;
 					else
-						matriz[i][j] = (j > 0)? figura_4x4[i][j-1] : 0;
+						matriz[i][j] = (j > 0) ? figura_4x4[i][j-1] : 0;
 				}
 			break;
 		
@@ -281,7 +285,9 @@ int movimiento_interno(int direccion)
 			for(i = tamano - 1; i >= 0; i--)
 				for(j = 0; j < tamano; j++)
 				{
-					if(tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO)
+                    if(tamano < 3)
+                        matriz[i][j] = (i > 0 ? figura_2x2[i-1][j] : 0);
+					else if(tamano < 4)
 						matriz[i][j] = (i > 0 ? figura_3x3[i-1][j] : 0);
 					else
 						matriz[i][j] = (i > 0 ? figura_4x4[i-1][j] : 0);
@@ -304,8 +310,8 @@ int movimiento_interno(int direccion)
 		for(i = 0; i < tamano; i++)
 			for(j = 0; j < tamano; j++)
 			{
-				if(tipo_forma == F_CUADRADO) figura_2x2[i][j] = matriz[i][j]; // Esta reasignación no es necesaria.
-				else if(tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) figura_3x3[i][j] = matriz[i][j];
+				if(tamano < 3) figura_2x2[i][j] = matriz[i][j];
+				else if(tamano < 4) figura_3x3[i][j] = matriz[i][j];
 				else figura_4x4[i][j] = matriz[i][j];
 			}
 		mvprintw(21, 0, "INT No se detecto colision....");
@@ -326,7 +332,9 @@ int verifica_espacio(int direccion)
 		
 		while(espacio && k < tamano)
 		{
-			if(tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) {
+			if(tamano < 3) {
+                if(figura_2x2[direccion == M_ABAJO ? tamano - 1 : k][direccion == M_ABAJO ? k : aux]) espacio = 0; }
+            else if(tamano < 4) {
 				if(figura_3x3[direccion == M_ABAJO ? tamano - 1 : k][direccion == M_ABAJO ? k : aux]) espacio = 0; }
 			else if(figura_4x4[direccion == M_ABAJO ? tamano - 1 : k][direccion == M_ABAJO ? k : aux]) espacio = 0;
 			k++;
@@ -422,8 +430,8 @@ int detecta_colision(int px, int py)
 		x = px; j = 0;
 		while(!colision && j < tamano)
 		{
-			if(tipo_forma == F_CUADRADO) colision = (figura_2x2[i][j] && tablero[py][x]);
-			else if (tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) colision = (figura_3x3[i][j] && tablero[py][x]);
+			if(tamano < 3) colision = (figura_2x2[i][j] && tablero[py][x]);
+			else if (tamano < 4) colision = (figura_3x3[i][j] && tablero[py][x]);
 			else colision = (figura_4x4[i][j] && tablero[py][x]);
 			j++; x++;
 		}
@@ -443,10 +451,10 @@ void coloca_figura_en_tablero()
 	for(i = 0, py = pos_y; i < tamano; i++, py++)
 		for(j = 0, px = pos_x; j < tamano; j++, px++)
 		{
-			if(tipo_forma == F_CUADRADO) {
+			if(tamano < 3) {
 				if(figura_2x2[i][j]) tablero[py][px] = figura_2x2[i][j];
 			}
-			else if (tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) {
+			else if (tamano < 4) {
 				if(figura_3x3[i][j]) tablero[py][px] = figura_3x3[i][j];
 			}
 			else if(figura_4x4[i][j]) tablero[py][px] = figura_4x4[i][j];
@@ -461,10 +469,10 @@ void imprime_figura()
 	{		
 		px = pos_x;
 		for (j = 0; j < tamano; j++, px++) {
-			if(tipo_forma == F_CUADRADO){
+			if(tamano < 3){
 				if(figura_2x2[i][j]) mvprintw(py, px*2, "%d", figura_2x2[i][j]);
 			}
-			else if (tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) {
+			else if (tamano < 4) {
 				if(figura_3x3[i][j]) mvprintw(py, px*2, "%d", figura_3x3[i][j]);
 			}
 			else if(figura_4x4[i][j]) mvprintw(py, px*2, "%d", figura_4x4[i][j]);
@@ -503,8 +511,8 @@ int rotar_figura()
 	for(i = 0, k = tamano - 1; i < tamano, k >= 0; i++, k--)
 		for(j = 0; j < tamano; j++)
 		{
-			if(tipo_forma == F_CUADRADO) aux[j][k] = figura_2x2[i][j]; // Esta no es necesaria a menos que se agregen mas figuras de 2x2.
-			else if(tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) aux[j][k] = figura_3x3[i][j];
+			if(tamano < 3) aux[j][k] = figura_2x2[i][j];
+			else if(tamano < 4) aux[j][k] = figura_3x3[i][j];
 			else aux[j][k] = figura_4x4[i][j];
 		}
 	// Se verfica que al momento de querer girar la pieza no haya colision.
@@ -523,8 +531,8 @@ int rotar_figura()
 		for(i = 0; i < tamano; i++)
 			for(j = 0; j < tamano; j++)
 			{
-				if(tipo_forma == F_CUADRADO) figura_2x2[i][j] = aux[i][j]; // Esta reasignación no es necesaria.
-				else if(tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) figura_3x3[i][j] = aux[i][j];
+				if(tamano < 3) figura_2x2[i][j] = aux[i][j];
+				else if(tamano < 4) figura_3x3[i][j] = aux[i][j];
 				else figura_4x4[i][j] = aux[i][j];
 			}
 	if(colision) { mvprintw(21, 0, "ROT Colision en [ %d][ %d]..", px-1, py-1); refresh();} 
@@ -540,9 +548,9 @@ void asigna_figura()
 	for(i = 0; i < tamano; i++)
 		for (j = 0; j < tamano; j++)
 		{	
-            if(tipo_forma >= F_I_CORTA && tipo_forma <= F_CUADRADO)
+            if(tamano < 3)
                 figura_2x2[i][j] = formas_2x2[tipo_forma][i][j];
-			else if (tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO)
+			else if (tamano < 4)
                 figura_3x3[i][j] = formas_3x3[tipo_forma-DESFASE1][i][j];
 			else
                 figura_4x4[i][j] = formas_4x4[tipo_forma-DESFASE2][i][j];
