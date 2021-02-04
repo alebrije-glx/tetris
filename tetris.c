@@ -107,7 +107,7 @@ int main(void)
 	getmaxyx(stdscr, scr_size_y, scr_size_x); // Obtiene el tamaño de la ventana.
 	
 	inicializa_tablero();
-	imprime_tablero();
+	//imprime_tablero();
 	
 	timeout(0); // Sin bloqueo al momento de solicitar un caracter con getch()
 				// Un num. positivo indica el tiempo de espera en milisegundos.
@@ -260,49 +260,22 @@ int movimiento_interno(int direccion)
 		case M_IZQ:
 			for(i = 0; i < tamano; i++)
 				for(j = 0; j < tamano ; j++)
-				{
 					matriz[i][j] = (j < tamano -1) ? figura[i][j+1] : 0;
-                    /*
-                    if(tamano < 3)
-                        matriz[i][j] = (j < tamano -1) ? figura_2x2[i][j+1] : 0;
-                    else if(tamano < 4)
-						matriz[i][j] = (j < tamano -1) ? figura_3x3[i][j+1] : 0;
-					else
-						matriz[i][j] = (j < tamano -1) ? figura_4x4[i][j+1] : 0;
-                    */
-				}
+				
 			break;
 			
 		case M_DER:
 			for(i = 0; i < tamano; i++)
 				for(j = tamano - 1; j >= 0; j--)
-				{
                     matriz[i][j] = (j > 0) ? figura[i][j-1] : 0;
-                    /*
-                    if(tamano < 3)
-                        matriz[i][j] = (j > 0) ? figura_2x2[i][j-1] : 0;
-					else if(tamano < 4)
-						matriz[i][j] = (j > 0) ? figura_3x3[i][j-1] : 0;
-					else
-						matriz[i][j] = (j > 0) ? figura_4x4[i][j-1] : 0;
-                    */
-				}
+				
 			break;
 		
 		case M_ABAJO:
 			for(i = tamano - 1; i >= 0; i--)
 				for(j = 0; j < tamano; j++)
-				{
                     matriz[i][j] = (i > 0 ? figura[i-1][j] : 0);
-                    /*
-                    if(tamano < 3)
-                        matriz[i][j] = (i > 0 ? figura_2x2[i-1][j] : 0);
-					else if(tamano < 4)
-						matriz[i][j] = (i > 0 ? figura_3x3[i-1][j] : 0);
-					else
-						matriz[i][j] = (i > 0 ? figura_4x4[i-1][j] : 0);
-                    */
-				}
+                    
 			break;
 	}
 	// Detectar la colisión de la figura (matriz) del movimiento.
@@ -318,16 +291,10 @@ int movimiento_interno(int direccion)
 	}
 	// Si no hay colision, se ajusta la pieza.
 	if(!colision) {
-		for(i = 0; i < tamano; i++)
+		for(i = 0; i < tamano; i++) {
 			for(j = 0; j < tamano; j++)
-			{
                 figura[i][j] = matriz[i][j];
-                /*
-				if(tamano < 3) figura_2x2[i][j] = matriz[i][j];
-				else if(tamano < 4) figura_3x3[i][j] = matriz[i][j];
-				else figura_4x4[i][j] = matriz[i][j];
-                */
-			}
+        }
 		mvprintw(21, 0, "INT No se detecto colision....");
 	}
 	else { mvprintw(21, 0, "INT Colision en: [ %d][ %d]..", px-1, py-1); refresh(); }
@@ -347,13 +314,6 @@ int verifica_espacio(int direccion)
 		while(espacio && k < tamano)
 		{
             if(figura[direccion == M_ABAJO ? tamano - 1 : k][direccion == M_ABAJO ? k : aux]) espacio = 0;
-            /*
-			if(tamano < 3) {
-                if(figura_2x2[direccion == M_ABAJO ? tamano - 1 : k][direccion == M_ABAJO ? k : aux]) espacio = 0; }
-            else if(tamano < 4) {
-				if(figura_3x3[direccion == M_ABAJO ? tamano - 1 : k][direccion == M_ABAJO ? k : aux]) espacio = 0; }
-			else if(figura_4x4[direccion == M_ABAJO ? tamano - 1 : k][direccion == M_ABAJO ? k : aux]) espacio = 0;
-            */
 			k++;
 		}
 	}				
@@ -418,15 +378,14 @@ void recorre_filas_abajo(int fila)
 void verifica_movimiento(int direccion)
 {
 	int px = pos_x, py = pos_y;
-	// detecta_colision(px, py)
-	//if(!detecta_colision(direccion == M_ABAJO ? py + 1 : py, direccion == M_IZQ ? px - 1: (direccion == M_DER ? px + 1 : px)))
+
 	if(!detecta_colision(direccion == M_IZQ ? px - 1: (direccion == M_DER ? px + 1 : px), direccion == M_ABAJO ? py + 1 : py))
 	{
 		if(direccion == M_IZQ || direccion == M_DER)
 			pos_x = (direccion == M_IZQ ? px - 1 : px + 1);
 		
 		if(direccion == M_ABAJO)
-			pos_y = py + 1; // o pox_x++;
+			pos_y = py + 1;
 
 		mvprintw(19, 0, "x = %d, y = %d...", pos_x, pos_y);
 		mvprintw(21, 35, "NOR movimiento a: [ %d][ %d]....", pos_x, pos_y);
@@ -448,11 +407,6 @@ int detecta_colision(int px, int py)
 		while(!colision && j < tamano)
 		{
 			colision = (figura[i][j] && tablero[py][x]);
-            /*
-            if(tamano < 3) colision = (figura_2x2[i][j] && tablero[py][x]);
-			else if (tamano < 4) colision = (figura_3x3[i][j] && tablero[py][x]);
-			else colision = (figura_4x4[i][j] && tablero[py][x]);
-            */
 			j++; x++;
 		}
 		i++; py++;
@@ -470,18 +424,7 @@ void coloca_figura_en_tablero()
 	
 	for(i = 0, py = pos_y; i < tamano; i++, py++)
 		for(j = 0, px = pos_x; j < tamano; j++, px++)
-		{
 			if(figura[i][j]) tablero[py][px] = figura[i][j];
-            /*
-            if(tamano < 3) {
-				if(figura_2x2[i][j]) tablero[py][px] = figura_2x2[i][j];
-			}
-			else if (tamano < 4) {
-				if(figura_3x3[i][j]) tablero[py][px] = figura_3x3[i][j];
-			}
-			else if(figura_4x4[i][j]) tablero[py][px] = figura_4x4[i][j];
-            */
-		}
 }
 
 void imprime_figura()
@@ -491,18 +434,9 @@ void imprime_figura()
 	for(i = 0; i < tamano; i++, py++)
 	{		
 		px = pos_x;
-		for (j = 0; j < tamano; j++, px++) {
-            if(figura[i][j]) mvprintw(py, px*2, "%d", figura[i][j]);
-            /*
-			if(tamano < 3){
-				if(figura_2x2[i][j]) mvprintw(py, px*2, "%d", figura_2x2[i][j]);
-			}
-			else if (tamano < 4) {
-				if(figura_3x3[i][j]) mvprintw(py, px*2, "%d", figura_3x3[i][j]);
-			}
-			else if(figura_4x4[i][j]) mvprintw(py, px*2, "%d", figura_4x4[i][j]);
-            */
-		}
+		for (j = 0; j < tamano; j++, px++)
+            if(figura[i][j])
+                mvprintw(py, px*2, "%d", figura[i][j]);
 	}
 	refresh();
 }
@@ -536,14 +470,8 @@ int rotar_figura()
 
 	for(i = 0, k = tamano - 1; i < tamano, k >= 0; i++, k--)
 		for(j = 0; j < tamano; j++)
-		{
 			aux[j][k] = figura[i][j];
-            /*
-            if(tamano < 3) aux[j][k] = figura_2x2[i][j];
-			else if(tamano < 4) aux[j][k] = figura_3x3[i][j];
-			else aux[j][k] = figura_4x4[i][j];
-            */
-		}
+
 	// Se verfica que al momento de querer girar la pieza no haya colision.
 	i = 0;
 	while(!colision && i < tamano) {
@@ -559,16 +487,10 @@ int rotar_figura()
 	if(!colision)
 		for(i = 0; i < tamano; i++)
 			for(j = 0; j < tamano; j++)
-			{   
                 figura[i][j] = aux[i][j];
-                /*
-				if(tamano < 3) figura_2x2[i][j] = aux[i][j];
-				else if(tamano < 4) figura_3x3[i][j] = aux[i][j];
-				else figura_4x4[i][j] = aux[i][j];
-                */
-			}
+                
 	if(colision) { mvprintw(21, 0, "ROT Colision en [ %d][ %d]..", px-1, py-1); refresh();} 
-	else mvprintw(21, 0, "ROT_PTR No se detecto colision.....");
+	else mvprintw(21, 0, "ROT No se detecto colision.....");
 	
 	return colision;
 }
