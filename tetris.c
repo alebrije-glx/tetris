@@ -1,15 +1,16 @@
 #include <stdlib.h>
 #include <sys/time.h>	// Para obtener tiempo del sistema
-#include <ncurses.h>	// Para dibujar tablero
+#include <ncurses.h>	// Para dibujar el juego en modo texto.
 #include <unistd.h>		// Por la funcion usleep
 #include <time.h>		// por rand y srand
 
 #define TABLERO_H   16	// Altura del tablero (filas)
 #define TABLERO_W   16	// Ancho del tablero (columnas)
 
-#define DESFASE1     3    // Esta es la diferencia al seleccionar una forma de 2 o de 3.
-#define DESFASE2     8    // Esta es la diferencia al seleccionar una forma de 3 o de 4.
-#define CANT_FIGURAS 9
+#define FIG_2x2   3    // Cantidad de figuras de 2x2.
+#define FIG_3x3   5    // Cantidad de figuras de 3x3.
+#define TOTAL_FIG 9    // Cantidad de figuras en total, incluyendo las de 4x4.
+//    <----- Formas de 2x2 ------> | <-------------- Formas de 5x5 ---------------> | <- Formas de 4x4 ->
 //        0        1          2          3           4          5      6        7        8
 enum {F_I_CORTA, F_CODO, F_CUADRADO, F_LNORMAL, F_LINVERTIDA, F_ZETA, F_ESE, F_PODIO, F_I_LARGA};
 
@@ -551,16 +552,16 @@ void asigna_figura()
             if(tamano < 3)
                 figura_2x2[i][j] = formas_2x2[tipo_forma][i][j];
 			else if (tamano < 4)
-                figura_3x3[i][j] = formas_3x3[tipo_forma-DESFASE1][i][j];
+                figura_3x3[i][j] = formas_3x3[tipo_forma-FIG_2x2][i][j];
 			else
-                figura_4x4[i][j] = formas_4x4[tipo_forma-DESFASE2][i][j];
+                figura_4x4[i][j] = formas_4x4[tipo_forma-(FIG_2x2+FIG_3x3)][i][j];
 		}
 }
 
 void selecciona_figura()
 {
 	srand(time(NULL));
-	tipo_forma = (int)(rand() % CANT_FIGURAS);
+	tipo_forma = (int)(rand() % TOTAL_FIG);
 	
 	if(tipo_forma >= F_I_CORTA && tipo_forma <= F_CUADRADO) tamano = 2;
 	else if (tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) tamano = 3;
