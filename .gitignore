@@ -1,2 +1,6 @@
 Makefile
-prueba
+tetris
+/include
+/lib64
+tetris_shared
+tetris_static

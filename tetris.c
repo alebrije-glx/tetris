@@ -4,18 +4,25 @@
 #include <unistd.h>		// Por la funcion usleep
 #include <time.h>		// por rand y srand
 
-#define TABLERO_H 16	// Altura del tablero (filas)
-#define TABLERO_W 16	// Ancho del tablero (columnas)
+#define TABLERO_H   16	// Altura del tablero (filas)
+#define TABLERO_W   16	// Ancho del tablero (columnas)
 
-//			0		   1		   2			3			4		   5		6
-enum {F_CUADRADO, F_LNORMAL, F_LINVERTIDA, F_ZNORMAL, F_ZINVERTIDA, F_PODIO, F_LARGA};
+#define DESFASE1     3    // Esta es la diferencia al seleccionar una forma de 2 o de 3.
+#define DESFASE2     8    // Esta es la diferencia al seleccionar una forma de 3 o de 4.
+#define CANT_FIGURAS 9
+//        0        1          2          3           4          5      6        7        8
+enum {F_I_CORTA, F_CODO, F_CUADRADO, F_LNORMAL, F_LINVERTIDA, F_ZETA, F_ESE, F_PODIO, F_I_LARGA};
 
 enum {M_IZQ, M_DER, M_ABAJO};
 
-char *nombre_fig[]= { "CUADRADO...", "L_NORMAL...", "L_INVERTIDA", "Z_NORMAL...", "Z_INVERTIDA", "PODIO......", "LARGA......"};
+char *nombre_fig[]= { "I_CORTA....", "CODO.......", "CUADRADO...", "L_NORMAL...", "L_INVERTIDA", "ZETA.......", "ESE........", "PODIO......", "I_LARGA...."};
 
-int formas_2x2[2][2] = { {1,0},
-						 {1,1} };
+int formas_2x2[3][2][2] = {{ {1,0},
+						     {1,0} },
+                           { {1,0},
+						     {1,1} },
+                           { {1,1},
+                             {1,1} }};
 							 
 int formas_3x3[5][3][3] = {{ {1,0,0},
 							 {1,0,0},
@@ -33,10 +40,10 @@ int formas_3x3[5][3][3] = {{ {1,0,0},
 							 {1,1,1},
 							 {0,0,0} }};
 								 
-int formas_4x4[4][4] = { {0,0,0,0},
-						 {0,0,0,0},
-						 {1,1,1,1},
-						 {0,0,0,0} };
+int formas_4x4[1][4][4] = {{ {0,0,0,0},
+						     {0,0,0,0},
+						     {1,1,1,1},
+						     {0,0,0,0} }};
 
 int tablero[TABLERO_H][TABLERO_W];
 
@@ -533,18 +540,21 @@ void asigna_figura()
 	for(i = 0; i < tamano; i++)
 		for (j = 0; j < tamano; j++)
 		{	
-			if(tipo_forma == F_CUADRADO) figura_2x2[i][j] = formas_2x2[i][j];
-			else if (tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) figura_3x3[i][j] = formas_3x3[tipo_forma-1][i][j];
-			else figura_4x4[i][j] = formas_4x4[i][j];
+            if(tipo_forma >= F_I_CORTA && tipo_forma <= F_CUADRADO)
+                figura_2x2[i][j] = formas_2x2[tipo_forma][i][j];
+			else if (tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO)
+                figura_3x3[i][j] = formas_3x3[tipo_forma-DESFASE1][i][j];
+			else
+                figura_4x4[i][j] = formas_4x4[tipo_forma-DESFASE2][i][j];
 		}
 }
 
 void selecciona_figura()
 {
 	srand(time(NULL));
-	tipo_forma = (int)(rand() % 7);
+	tipo_forma = (int)(rand() % CANT_FIGURAS);
 	
-	if(tipo_forma == F_CUADRADO) tamano = 2;
+	if(tipo_forma >= F_I_CORTA && tipo_forma <= F_CUADRADO) tamano = 2;
 	else if (tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) tamano = 3;
 	else tamano = 4;
 }
