@@ -175,15 +175,16 @@ int main(void)
 					break;
 				
 				default:
-					tiempo_limite = (long)timedifference_msec(t_anterior, t_actual);
-					
-					if(tiempo_limite > 2000) { // 500
-						mov_abajo = 1;
-						gettimeofday(&t_anterior, 0);
-					}
-					mvprintw(2, 35, "......................", tiempo_limite);
 					break;
 			}
+            tiempo_limite = (long)timedifference_msec(t_anterior, t_actual);
+            
+            if(tiempo_limite > 2000) { // 500
+                mov_abajo = 1;
+                gettimeofday(&t_anterior, 0);
+            }
+            mvprintw(1, 35, "Tiempo limite por movimiento: %ld....", tiempo_limite);
+            
 		} // el if de game over
 		
 		usleep(20000);
@@ -219,7 +220,7 @@ void crea_nueva_figura()
 	asigna_figura();
 	
     if(detecta_colision(pos_x, pos_y))
-	game_over = 1;
+        game_over = 1;
 				
 	else
 	{
@@ -473,7 +474,7 @@ int rotar_figura()
 	int i, j, k, colision = 0, py = pos_y, px;
 	int aux[tamano][tamano]; // Matriz auxiliar para guardar la rotacion.
 
-	for(i = 0, k = tamano - 1; i < tamano, k >= 0; i++, k--)
+	for(i = 0, k = tamano - 1; i < tamano && k >= 0; i++, k--)
 		for(j = 0; j < tamano; j++)
 			aux[j][k] = figura[i][j];
 
@@ -496,7 +497,7 @@ int rotar_figura()
                 
 	if(colision) { mvprintw(21, 0, "ROT Colision en [ %d][ %d]..", px-1, py-1); refresh();} 
 	else mvprintw(21, 0, "ROT No se detecto colision.....");
-	
+    
 	return colision;
 }
 
