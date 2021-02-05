@@ -117,28 +117,7 @@ int main(void)
 	{	
 		if(pieza_colocada)
             crea_nueva_figura();
-        /*
-		{
-			pos_y = 0; pos_x = (TABLERO_W / 2) - 2;
 
-			selecciona_figura();
-			asigna_figura();
-			
-			if(detecta_colision(pos_x, pos_y))
-				game_over = 1;
-				
-			else
-			{
-				mvprintw(17, 0, "Figura seleccionada: %s", nombre_fig[tipo_forma]);
-				mvprintw(17, 40, "Tamano: %d..", tamano);
-				mvprintw(4, 35, "cima y: %d", top_y);
-				pieza_colocada = 0;
-			}
-			
-			imprime_tablero();
-			imprime_figura();
-		}
-        */
 		if(!game_over)
 		{
 			if(mov_abajo) opcion = KEY_DOWN;
