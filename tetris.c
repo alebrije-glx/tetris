@@ -10,6 +10,7 @@
 #define FIG_2x2   3    // Cantidad de figuras de 2x2.
 #define FIG_3x3   5    // Cantidad de figuras de 3x3.
 #define TOTAL_FIG 9    // Cantidad de figuras en total, incluyendo las de 4x4.
+
 //    <----- Formas de 2x2 ------> | <-------------- Formas de 5x5 ---------------> | <- Formas de 4x4 ->
 //        0        1          2          3           4          5      6        7        8
 enum {F_I_CORTA, F_CODO, F_CUADRADO, F_LNORMAL, F_LINVERTIDA, F_ZETA, F_ESE, F_PODIO, F_I_LARGA};
@@ -58,6 +59,7 @@ int *figura[4];
 void inicializa_tablero();
 void selecciona_figura();
 void asigna_figura();
+void crea_nueva_figura();
 void imprime_figura();
 void imprime_tablero();
 int rotar_figura();
@@ -114,6 +116,8 @@ int main(void)
 	do
 	{	
 		if(pieza_colocada)
+            crea_nueva_figura();
+        /*
 		{
 			pos_y = 0; pos_x = (TABLERO_W / 2) - 2;
 
@@ -134,7 +138,7 @@ int main(void)
 			imprime_tablero();
 			imprime_figura();
 		}
-		
+        */
 		if(!game_over)
 		{
 			if(mov_abajo) opcion = KEY_DOWN;
@@ -226,6 +230,28 @@ int main(void)
 	printf("Tiempo transcurrido: %.3f milisegundos.\n", tiempo_transcurrido);
 	
 	return 0;
+}
+
+void crea_nueva_figura()
+{
+    pos_y = 0; pos_x = (TABLERO_W / 2) - 2;
+
+    selecciona_figura();
+	asigna_figura();
+	
+    if(detecta_colision(pos_x, pos_y))
+	game_over = 1;
+				
+	else
+	{
+        mvprintw(17, 0, "Figura seleccionada: %s", nombre_fig[tipo_forma]);
+		mvprintw(17, 40, "Tamano: %d..", tamano);
+		mvprintw(4, 35, "cima y: %d", top_y);
+		pieza_colocada = 0;
+    }
+			
+	imprime_tablero();
+	imprime_figura();
 }
 
 //float timedifference_msec(struct timeval t0, struct timeval t1)
