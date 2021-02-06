@@ -63,6 +63,7 @@ void asigna_figura();
 void crea_nueva_figura();
 void imprime_figura();
 void imprime_tablero();
+void analiza_tecla_pulsada(int tecla);
 int rotar_figura();
 void verifica_movimiento(int direccion);
 int detecta_colision(int px, int py);
@@ -136,62 +137,8 @@ void jugar_tetris()
 			
 		gettimeofday(&t_actual, 0);
 		
-		switch(opcion)
-		{	
-			case KEY_UP: // Rotación
-				if(!rotar_figura()) {
-					mvprintw(19, 35, "ROT: x = %d, y = %d...", pos_x, pos_y);
-					imprime_tablero();
-					imprime_figura();
-				}
-				
-				mvprintw(2, 35, "Tecla KEY_UP........");
-				break;
-			
-			case KEY_LEFT:
-				if(pos_x - 1 >= 0)
-					verifica_movimiento(M_IZQ);
-				else
-					movimiento_en_limites(M_IZQ);
-					
-				mvprintw(2, 35, "Tecla KEY_LEFT......");
-				break;
-
-			case KEY_RIGHT:
-				if(pos_x + 1 <= TABLERO_W - tamano)
-					verifica_movimiento(M_DER);
-				else
-					movimiento_en_limites(M_DER);
-				
-				mvprintw(2, 35, "Tecla KEY_RIGHT.....");
-				break;
-				
-			case KEY_DOWN:
-				if(pos_y + 1 <= TABLERO_H - tamano)
-					verifica_movimiento(M_ABAJO);
-				else
-					movimiento_en_limites(M_ABAJO);
-
-				if(pieza_colocada)
-				{
-					if (pos_y < top_y) top_y = pos_y;
-					mvprintw(4, 35, "cima y: %d...", top_y);
-					refresh();
-					coloca_figura_en_tablero();
-					verifica_linea_completa();
-				}
-				if(mov_abajo) mov_abajo = 0;
-				
-				mvprintw(2, 35, "Tecla KEY_DOWN......");
-				break;
-            
-            case KEY_END:  // Si presionamos la tecla FIN, terminamos la partida.
-                game_over = 1;
-                break;
-			
-			default:
-				break;
-        }
+		analiza_tecla_pulsada(opcion);
+        
         tiempo_limite = (long)timedifference_msec(t_anterior, t_actual);
         
         if(tiempo_limite > velocidad) { // 500
@@ -213,6 +160,66 @@ void jugar_tetris()
 	while(!getch());
 	
 	usleep(2000000); // Espera dos segundos.
+}
+
+void analiza_tecla_pulsada(int tecla)
+{
+    switch(tecla)
+    {	
+		case KEY_UP: // Rotación
+			if(!rotar_figura()) {
+				mvprintw(19, 35, "ROT: x = %d, y = %d...", pos_x, pos_y);
+				imprime_tablero();
+				imprime_figura();
+			}
+				
+			mvprintw(2, 35, "Tecla KEY_UP........");
+			break;
+        
+		case KEY_LEFT:
+			if(pos_x - 1 >= 0)
+				verifica_movimiento(M_IZQ);
+			else
+				movimiento_en_limites(M_IZQ);
+				
+			mvprintw(2, 35, "Tecla KEY_LEFT......");
+			break;
+
+		case KEY_RIGHT:
+			if(pos_x + 1 <= TABLERO_W - tamano)
+				verifica_movimiento(M_DER);
+			else
+				movimiento_en_limites(M_DER);
+            
+			mvprintw(2, 35, "Tecla KEY_RIGHT.....");
+			break;
+				
+		case KEY_DOWN:
+			if(pos_y + 1 <= TABLERO_H - tamano)
+				verifica_movimiento(M_ABAJO);
+			else
+				movimiento_en_limites(M_ABAJO);
+
+			if(pieza_colocada)
+			{
+				if (pos_y < top_y) top_y = pos_y;
+				mvprintw(4, 35, "cima y: %d...", top_y);
+				refresh();
+				coloca_figura_en_tablero();
+				verifica_linea_completa();
+			}
+			if(mov_abajo) mov_abajo = 0;
+				
+			mvprintw(2, 35, "Tecla KEY_DOWN......");
+			break;
+            
+        case KEY_END:  // Si presionamos la tecla FIN, terminamos la partida.
+            game_over = 1;
+            break;
+            
+        default:
+			break;
+    }
 }
 
 void crea_nueva_figura()
