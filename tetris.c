@@ -56,6 +56,7 @@ int figura_2x2[2][2];	// movimiento y rotacion sobre estas.
 int *figura[4];
 // ******** FUNCIONES NECESARIAS PARA EL JUEGO *************************
 
+void jugar_tetris();
 void inicializa_tablero();
 void selecciona_figura();
 void asigna_figura();
@@ -85,20 +86,10 @@ int opcion, mov_abajo;		// Para leer el teclado (en ncurses) debe ser un entero,
 int main(void)
 {
 	int scr_size_x = 0, scr_size_y = 0;
-
-	struct timeval tincio, tfin, t_anterior, t_actual;
+	struct timeval t_incio, t_fin;
+    float tiempo_transcurrido; // Tiempo en milisegundos (ms).
 	
-	float tiempo_transcurrido; // Tiempo en milisegundos (ms).
-	
-	long tiempo_limite;
-	
-	gettimeofday(&tincio, 0);
-	
-	gettimeofday(&t_anterior, 0);
-	
-	pieza_colocada = 1, game_over = 0;
-	
-	top_y = (int)TABLERO_H;
+	gettimeofday(&t_incio, 0);
 	
 	initscr();
 	cbreak();
@@ -107,12 +98,33 @@ int main(void)
 	keypad(stdscr, TRUE); // Para usar las teclas de control, dirección, teclado númerico, etc.
 	
 	getmaxyx(stdscr, scr_size_y, scr_size_x); // Obtiene el tamaño de la ventana.
+	timeout(0); // Sin bloqueo al momento de solicitar un caracter con getch()
+				// Un num. positivo indica el tiempo de espera en milisegundos.
+    jugar_tetris();
+	
+	gettimeofday(&t_fin, 0);
+	tiempo_transcurrido = timedifference_msec(t_incio, t_fin);
+
+	endwin();
+	
+	printf("Tiempo transcurrido: %.3f milisegundos.\n", tiempo_transcurrido);
+	
+	return 0;
+}
+
+void jugar_tetris()
+{
+	struct timeval t_anterior, t_actual;
+	long tiempo_limite;
+	
+	gettimeofday(&t_anterior, 0);
+    
+	pieza_colocada = 1, game_over = 0;
+	top_y = (int)TABLERO_H;
 	
 	inicializa_tablero();
 	//imprime_tablero();
 	
-	timeout(0); // Sin bloqueo al momento de solicitar un caracter con getch()
-				// Un num. positivo indica el tiempo de espera en milisegundos.
 	do
 	{	
 		if(pieza_colocada)
@@ -185,8 +197,7 @@ int main(void)
             }
             mvprintw(1, 35, "Tiempo limite por movimiento: %ld....", tiempo_limite);
             
-		} // el if de game over
-		
+		}
 		usleep(20000);
 		
 	}while(opcion != KEY_END && !game_over);
@@ -200,16 +211,6 @@ int main(void)
 	while(!getch());
 	
 	usleep(2000000);
-	
-	gettimeofday(&tfin, 0);
-	
-	tiempo_transcurrido = timedifference_msec(tincio, tfin);
-
-	endwin();
-	
-	printf("Tiempo transcurrido: %.3f milisegundos.\n", tiempo_transcurrido);
-	
-	return 0;
 }
 
 void crea_nueva_figura()
