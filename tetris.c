@@ -131,8 +131,8 @@ void jugar_tetris()
 		if(pieza_colocada)
             crea_nueva_figura();
 
-		if(!game_over)
-		{
+		//if(!game_over)
+		//{
 			if(mov_abajo) opcion = KEY_DOWN;
 			else opcion = getch();
 			
@@ -198,7 +198,7 @@ void jugar_tetris()
             }
             mvprintw(1, 35, "Tiempo limite por movimiento: %ld....", tiempo_limite);
             
-		}
+		//}
 		usleep(20000);
 		
 	}while(opcion != KEY_END && !game_over);
