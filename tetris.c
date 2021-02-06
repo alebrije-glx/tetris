@@ -116,6 +116,7 @@ void jugar_tetris()
 {
 	struct timeval t_anterior, t_actual;
 	long tiempo_limite;
+    const int velocidad = 500; // velocidad del juego en milisegundos.
 	
 	gettimeofday(&t_anterior, 0);
     
@@ -191,7 +192,7 @@ void jugar_tetris()
 			}
             tiempo_limite = (long)timedifference_msec(t_anterior, t_actual);
             
-            if(tiempo_limite > 2000) { // 500
+            if(tiempo_limite > velocidad) { // 500
                 mov_abajo = 1;
                 gettimeofday(&t_anterior, 0);
             }
