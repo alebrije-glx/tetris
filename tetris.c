@@ -533,19 +533,10 @@ void selecciona_figura()
     srand(time(NULL));
 	tipo_forma = (int)(rand() % TOTAL_FIG);
 	
-	if(tipo_forma >= F_I_CORTA && tipo_forma <= F_CUADRADO) {
-        tamano = 2;
-        for(int i = 0; i < tamano; i++)
-            figura[i] = figura_2x2[i];
-    }
-	else if (tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) {
-        tamano = 3;
-        for(int i = 0; i < tamano; i++)
-            figura[i] = figura_3x3[i];
-    }
-	else {
-        tamano = 4;
-        for(int i = 0; i < tamano; i++)
-            figura[i] = figura_4x4[i];
-    }
+	if(tipo_forma >= F_I_CORTA && tipo_forma <= F_CUADRADO) tamano = 2;
+	else if (tipo_forma >= F_LNORMAL && tipo_forma <= F_PODIO) tamano = 3;
+	else tamano = 4;
+    
+    for(int i = 0; i < tamano; i++)
+        figura[i] = (tamano < 3 ? figura_2x2[i] : (tamano < 4 ? figura_3x3[i] : figura_4x4[i]) );
 }
