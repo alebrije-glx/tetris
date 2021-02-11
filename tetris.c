@@ -155,9 +155,9 @@ void jugar_tetris()
 	mvprintw(8, 0, "P R E S I O N A  UNA  T E C L A");
 	mvprintw(10, 2, " P A R A  F I N A L I Z A R ");
 	
-	sleep(2);
+	//sleep(2);
 	
-	while(!getch());
+	//while(!getch());
 	
 	usleep(2000000); // Espera dos segundos.
 }
